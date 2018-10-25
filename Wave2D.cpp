@@ -1,8 +1,9 @@
 
 #pragma region Includes:
 	
-	#include <iostream>
+	#include <iostream>	// cout, cerr
 	#include <chrono>	// timer
+	#include <cmath>	// pow
 
 #pragma endregion
 
@@ -22,6 +23,7 @@
 	void initialize(double** z, int weight, const int size) noexcept;
 	void calculate(double** t_0, double** t_1, const int size) noexcept;
 	void calculate(double** t_0, double** t_1, double** t_2, const int size) noexcept;
+
 	void outputWave(double** current, const int t, const int size) noexcept;
 
 #pragma endregion
@@ -48,8 +50,8 @@
 
 	const int DEFAULT_SIZE = 100;		// default system size
 	const int DEFAULT_CELL_WIDTH = 8;	// default cell width
-	const int DEFAULT_TIME = 20;
-	const int DEFAULT_INTERVAL = 1;
+	const int DEFAULT_TIME = 500;		// default # of time steps
+	const int DEFAULT_INTERVAL = 0;		// default output interval 
 
 	const double WAVE_SPEED = 1.0;		// speed of waves (c)
 	const double TIME_QUANTUM = 0.1;	// time steps (dt)
@@ -58,6 +60,18 @@
 #pragma endregion
 
 
+/// <summary>
+///          Program entry point, verifies input and calls run.
+/// </summary>
+/// <param name="argc">
+///          The argument count received from operating system.
+/// </param>
+/// <param name="argv">
+///          The argument values received from operating system.
+/// </param>
+/// <returns>
+///          0 on successful execution, 1 otherwise.
+/// </returns>
 int main(int argc, char **argv)
 {
 	// Variables:
@@ -93,7 +107,10 @@ int main(int argc, char **argv)
 	} // end else
 
 	// check if args in range
-	argsValid(size, max_time, interval) ? __noop : exit(EXIT_FAILURE);
+	if (!argsValid(size, max_time, interval))
+	{
+		exit(EXIT_FAILURE);
+	} // end if
 
 	try
 	{
@@ -112,12 +129,27 @@ int main(int argc, char **argv)
 } // end Main
 
 
-bool argsValid(const int size, const int time, const int interval) noexcept
+/// <summary>
+///          Verifies the values of the command line arguments.
+/// </summary>
+/// <param name="SIZE">
+///          The dimension of the internal square matrices, must be in range [100, 5000].
+/// </param>
+/// <param name="TIME">
+///          The number of time-quanta to simulate, must be in range [3, 5000].
+/// </param>
+/// <param name="INTERVAL">
+///          The interval at which to print out the current wave, must be in range [0, <paramref name="TIME"/>].
+/// </param>
+/// <returns>
+///          True iff SIZE in [100, 5000] AND TIME in [3, 5000] AND INTERVAL in [0, <paramref name="TIME"/>]; otherwise, false.
+/// </returns>
+bool argsValid(const int SIZE, const int TIME, const int INTERVAL) noexcept
 {
-	if (!(size >= 100 && size <= 1000 && time >= 3 && time <= 1000 && interval >= 0 && interval <= 100))
+	if (!(SIZE >= 100 && SIZE <= 5000 && TIME >= 3 && TIME <= 5000 && INTERVAL >= 0 && INTERVAL <= TIME))
 	{
 		std::cerr << "usage: Wave2D size max_time interval" << std::endl;
-		std::cerr << "       where size >= 100 && time >= 3 && interval >= 0" << std::endl;
+		std::cerr << "       where 100 <= size <= 5000 && 3 <= time <= 5000 && 0 <= interval <= time" << std::endl;
 		return false;
 	} // end if
 
@@ -125,70 +157,111 @@ bool argsValid(const int size, const int time, const int interval) noexcept
 } // end method argsValid
 
 
-void instantiate(double***& z, const int size) noexcept
+/// <summary>
+///          Allocates the memory of the simulation space.
+/// </summary>
+/// <param name="z">
+///          A pointer to the memory being allocated.
+/// </param>
+/// <param name="SIZE">
+///          The dimension of the internal square matrices.
+/// </param>
+void instantiate(double***& z, const int SIZE) noexcept
 {
 	try
 	{
 		for (int p = 0; p < 3; p++)
 		{
-			z[p] = new double*[size];
-			for (int i = 0; i < size; i++)
+			z[p] = new double*[SIZE];
+			for (int i = 0; i < SIZE; i++)
 			{
-				z[p][i] = new double[size];
-				memset(z[p][i], 0, size * sizeof(double));
+				z[p][i] = new double[SIZE];
+				memset(z[p][i], 0, SIZE * sizeof(double));
 			} // end for i
 		} // end for p
 	} // end try
 	catch (std::bad_alloc& e)
 	{
 		std::cout << "Memory allocation failed!\n\tReason: " << e.what() << std::endl;
-		deallocate(z, size);
+		deallocate(z, SIZE);
 		exit(EXIT_FAILURE);
 	} // end catch
 } // end method instantiate
 
 
-void deallocate(double ***& z, const int size) noexcept
+/// <summary>
+///          Deallocates the memory of the simulation space.
+/// </summary>
+/// <param name="z">
+///          A pointer to the memory being deallocated.
+/// </param>
+/// <param name="SIZE">
+///          The dimension of the internal square matrices.
+/// </param>
+/// <remarks>
+///			The value of <paramref name="z"/> will be nullptr after execution.
+/// </remarks>
+void deallocate(double ***& z, const int SIZE) noexcept
 {
 	for (int p = 0; p < 3; p++)
 	{
-		for (int i = 0; i < size; i++)
+		for (int i = 0; i < SIZE; i++)
 		{
 			delete[] z[p][i];
 		} // end for i
+
 		delete[] z[p];
 	} // end for p
 
 	delete[] z;
+	z = nullptr;
 } // end method deallocate
 
 
-void initialize(double** t_0, int weight, const int size) noexcept
+/// <summary>
+///          Deallocates the memory of the simulation space.
+/// </summary>
+/// <param name="z">
+///          A pointer to the memory being deallocated.
+/// </param>
+/// <param name="SIZE">
+///          The dimension of the internal square matrices.
+/// </param>
+/// <remarks>
+///			The value of <paramref name="z"/> will be nullptr after execution.
+/// </remarks>
+void initialize(double** t_0, int weight, const int SIZE) noexcept
 {
-	for (int i = 0; i < size; i++)
+	// memset has already zeroed out the memory, only need to initialize the wave
+	for (auto i = (40 * weight) + 1; i < (60 * weight); i++)
 	{
-		for (int j = 0; j < size; j++)
+		for (auto j = (40 * weight) + 1; j < (60 * weight); j++)
 		{
-			if (i > 40 * weight && i < 60 * weight  && j > 40 * weight && j < 60 * weight)
-			{
-				t_0[i][j] = 20.0;
-			} // end if
-			else
-			{
-				t_0[i][j] = 0.0;
-			} // end else
+			t_0[i][j] = 20.0;
 		} // end for j
 	} // end for i
 } // end method initialize
 
 
-void calculate(double** t_0, double** t_1, const int size) noexcept
+/// <summary>
+///          Calculates the wave's state at t = 1.
+/// </summary>
+/// <param name="t_0">
+///          Output parameter, the new state of the wave will be stored in this matrix.
+/// </param>
+/// <param name="t_1">
+///          The state of the wave at t = -1 relative to right now.
+/// </param>
+/// <param name="SIZE">
+///          The dimension of the internal square matrices.
+/// </param>
+void calculate(double** t_0, double** t_1, const int SIZE) noexcept
 {
-	for (auto i = 0; i < size; i++)
+	for (auto i = 0; i < SIZE; i++)
 	{
-		for (auto j = 0; j < size; j++)
+		for (auto j = 0; j < SIZE; j++)
 		{
-			if (!i || !j || i + 1 == size || j + 1 == size)
+			if (!i || !j || i + 1 == SIZE || j + 1 == SIZE)
 			{
 				t_0[i][j] = 0.0;
 			} // end if
@@ -201,13 +274,28 @@ void calculate(double** t_0, double** t_1, const int size) noexcept
 } // end method calculate(3)
 
 
-void calculate(double** t_0, double** t_1, double** t_2, const int size) noexcept
+/// <summary>
+///          Calculates the wave's state at t >= 2.
+/// </summary>
+/// <param name="t_0">
+///          Output parameter, the new state of the wave will be stored in this matrix.
+/// </param>
+/// <param name="t_1">
+///          The state of the wave at t = -1 relative to right now.
+/// </param>
+/// <param name="t_2">
+///          The state of the wave at t = -2 relative to right now.
+/// </param>
+/// <param name="SIZE">
+///          The dimension of the internal square matrices.
+/// </param>
+void calculate(double** t_0, double** t_1, double** t_2, const int SIZE) noexcept
 {
-	for (auto i = 0; i < size; i++)
+	for (auto i = 0; i < SIZE; i++)
 	{
-		for (auto j = 0; j < size; j++)
+		for (auto j = 0; j < SIZE; j++)
 		{
-			if (!i || !j || i + 1 == size || j + 1 == size)
+			if (!i || !j || i + 1 == SIZE || j + 1 == SIZE)
 			{
 				t_0[i][j] = 0.0;
 			} // end if
@@ -221,14 +309,25 @@ void calculate(double** t_0, double** t_1, double** t_2, const int size) noexcep
 
 
 /*
-
-void outputWave(double** current, const int t, const int size) noexcept
+/// <summary>
+///          Outputs the given state of the wave according to the prescribed format.
+/// </summary>
+/// <param name="current">
+///          Current state of the wave for output.
+/// </param>
+/// <param name="TIME">
+///          The time-slice corresponding to this wave state.
+/// </param>
+/// <param name="SIZE">
+///          The dimension of the matrix.
+/// </param>
+void outputWave(double** current, const int TIME, const int SIZE) noexcept
 {
-	std::cout << t << std::endl;
+	std::cout << TIME << std::endl;
 
-	for (auto i = 0; i < size; i++)
+	for (auto i = 0; i < SIZE; i++)
 	{
-		for (auto j = 0; j < size; j++)
+		for (auto j = 0; j < SIZE; j++)
 		{
 			std::cout << current[i][j];
 		} // end for j
@@ -241,18 +340,23 @@ void outputWave(double** current, const int t, const int size) noexcept
 
 /*/
 
-void outputWave(double** current, const int t, const int size) noexcept
+
+//!_START_REMOVE!
+/// <summary>
+///          DEBUG VERSION 
+/// </summary>
+void outputWave(double** current, const int TIME, const int SIZE) noexcept
 {
-	for (auto i = 0; i < size; i++)
+	for (auto i = 0; i < SIZE; i++)
 	{
-		for (auto j = 0; j < size; j++)
+		for (auto j = 0; j < SIZE; j++)
 		{
 			std::cout << current[i][j];
-			if (j + 1 < size)
+			if (j + 1 < SIZE)
 			{
 				std::cout << ",";
 			}
-			else if (i+1 < size)
+			else if (i+1 < SIZE)
 			{
 				std::cout << "|";
 			}
@@ -260,31 +364,46 @@ void outputWave(double** current, const int t, const int size) noexcept
 	} // end for i
 
 	std::cout << std::endl;
-}
+} // end method outputWave
+//!_END_REMOVE!
 //*/
 
-void run(const int size, const int max_time, const int interval)
+
+/// <summary>
+///          Calculates the wave's state at t >= 2.
+/// </summary>
+/// <param name="SIZE">
+///          The dimension of the internal square matrices.
+/// </param>
+/// <param name="MAX_TIME">
+///          The number of time steps to simulate.
+/// </param>
+/// <param name="INTERVAL">
+///          The printing interval for output.
+/// </param>
+void run(const int SIZE, const int MAX_TIME, const int INTERVAL)
 {
 	// Variables:
-	double*** z = new double**[3]; // simulation space
-	double** current = nullptr,
-		  ** previous = nullptr,
-		  ** previous2 = nullptr,
-		  ** temp = nullptr;
+	double*** z = new double**[3], // simulation space
+		  **  current = nullptr,
+		  **  previous = nullptr,
+		  **  previous2 = nullptr,
+		  **  temp = nullptr;
+
 
 	// instantiate memory of z
-	instantiate(z, size);
+	instantiate(z, SIZE);
 
 	_TimePoint end, start = _Clock::now();
 
 	// time = 0;
 	// initialize the simulation space: calculate z[0][][]
-	initialize(z[0], static_cast<int>(size / DEFAULT_SIZE), size);
+	initialize(z[0], static_cast<int>(SIZE / DEFAULT_SIZE), SIZE);
 
 	// time = 1
 	// calculate z[1][][] 
 	// cells not on edge
-	calculate(z[1], z[0], size);
+	calculate(z[1], z[0], SIZE);
 
 	current = z[2];
 	previous = z[1];
@@ -292,26 +411,28 @@ void run(const int size, const int max_time, const int interval)
 
 	#if !BENCHMARK
 		// output starting point
-		outputWave(z[0], 0, size);
-		
-		// output second iteration if needed
-		if (interval <= 1)
+		if (INTERVAL != 0)
 		{
-			outputWave(z[1], 0, size);
+			outputWave(z[0], 0, SIZE);
+		} // end if
+		// output second iteration if needed
+		if (INTERVAL == 1)
+		{
+			outputWave(z[1], 0, SIZE);
 		} // end if
 	#endif	
 
 	// simulate wave diffusion from time = 2
-	for (int t = 2; t < max_time; t++)
+	for (int t = 2; t < MAX_TIME; t++)
 	{
 		// calculate new values of wave
-		calculate(current, previous, previous2, size);
+		calculate(current, previous, previous2, SIZE);
 
 		#if !BENCHMARK 
-		// print out current status every interval iterations
-			if (t <= 1 || !(t % interval))
+			// print out current status every interval iterations
+			if (INTERVAL != 0 && !(t % INTERVAL))
 			{
-				outputWave(current, t, size);
+				outputWave(current, t, SIZE);
 			} // end if
 		#endif	
 
@@ -324,12 +445,20 @@ void run(const int size, const int max_time, const int interval)
 
 	end = _Clock::now();
 
-	std::cout << "Elapsed time: " << DURATION_IN_MICROS(end - start) << std::endl;
+	#if !BENCHMARK
+		// output end result
+		if (INTERVAL != 0)
+		{
+			outputWave(current, MAX_TIME, SIZE);
+		} // end if
+	#endif
+
+	std::cout << "Elapsed time: " << DURATION_IN_MICROS(end - start) << " microseconds" << std::endl;
 
 	// null ptrs to memory being freed
 	current = previous = previous2 = temp = nullptr;
 
-	deallocate(z, size);
+	deallocate(z, SIZE);
 } // end method run
 
 
