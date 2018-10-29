@@ -233,9 +233,9 @@ void deallocate(double ***& z, const int SIZE) noexcept
 void initialize(double** t_0, int weight, const int SIZE) noexcept
 {
 	// memset has already zeroed out the memory, only need to initialize the wave
-	for (auto i = (40 * weight) + 1; i < (60 * weight); i++)
+	for (std::size_t i = (0.4 * SIZE) + 1; i < (0.6 * SIZE); i++)
 	{
-		for (auto j = (40 * weight) + 1; j < (60 * weight); j++)
+		for (std::size_t j = (0.4 * SIZE) + 1; j < (0.6 * SIZE); j++)
 		{
 			t_0[i][j] = 20.0;
 		} // end for j
@@ -308,7 +308,7 @@ void calculate(double** t_0, double** t_1, double** t_2, const int SIZE) noexcep
 } // end method calculate(4)
 
 
-/*
+//*
 /// <summary>
 ///          Outputs the given state of the wave according to the prescribed format.
 /// </summary>
@@ -329,7 +329,7 @@ void outputWave(double** current, const int TIME, const int SIZE) noexcept
 	{
 		for (auto j = 0; j < SIZE; j++)
 		{
-			std::cout << current[i][j];
+			std::cout << current[i][j] << " ";
 		} // end for j
 
 		std::cout << std::endl;
@@ -453,7 +453,7 @@ void run(const int SIZE, const int MAX_TIME, const int INTERVAL)
 		} // end if
 	#endif
 
-	std::cout << "Elapsed time: " << DURATION_IN_MICROS(end - start) << " microseconds" << std::endl;
+	//std::cout << "Elapsed time: " << DURATION_IN_MICROS(end - start) << " microseconds" << std::endl;
 
 	// null ptrs to memory being freed
 	current = previous = previous2 = temp = nullptr;

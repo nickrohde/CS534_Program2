@@ -1,0 +1,103 @@
+Execution with 1 MPI nodes and 1 threads.
+rank[0]'s range = 0 ~ 100
+Elapsed time: 18771 microseconds
+
+Execution with 1 MPI nodes and 1 threads.
+rank[0]'s range = 0 ~ 100
+Elapsed time: 199690 microseconds
+
+Execution with 1 MPI nodes and 1 threads.
+rank[0]'s range = 0 ~ 100
+Elapsed time: 203450 microseconds
+
+Execution with 4 MPI nodes and 1 threads.
+rank[0]'s range = 0 ~ 125
+rank[1]'s range = 125 ~ 250
+rank[2]'s range = 250 ~ 375
+rank[3]'s range = 375 ~ 500
+Elapsed time: 25024091 microseconds
+
+Execution with 4 MPI nodes and 1 threads.
+rank[0]'s range = 0 ~ 25
+rank[1]'s range = 25 ~ 50
+rank[2]'s range = 50 ~ 75
+rank[3]'s range = 75 ~ 100
+Elapsed time: 2166894 microseconds
+
+Execution with 2 MPI nodes and 1 threads.
+rank[0]'s range = 0 ~ 50
+rank[1]'s range = 50 ~ 100
+Elapsed time: 2169537 microseconds
+
+Execution with 4 MPI nodes and 4 threads.
+rank[0]'s range = 0 ~ 25
+rank[1]'s range = 25 ~ 50
+rank[2]'s range = 50 ~ 75
+rank[3]'s range = 75 ~ 100
+Elapsed time: 2423373 microseconds
+
+Execution with 2 MPI nodes and 1 threads.
+rank[0]'s range = 0 ~ 50
+rank[1]'s range = 50 ~ 100
+Elapsed time: 2035794 microseconds
+
+Execution with 4 MPI nodes and 4 threads.
+rank[0]'s range = 0 ~ 144
+rank[1]'s range = 144 ~ 288
+rank[2]'s range = 288 ~ 432
+rank[3]'s range = 432 ~ 576
+Elapsed time: 71900163 microseconds
+
+Execution with 4 MPI nodes and 1 threads.
+rank[0]'s range = 0 ~ 144
+rank[1]'s range = 144 ~ 288
+rank[2]'s range = 288 ~ 432
+rank[3]'s range = 432 ~ 576
+Elapsed time: 67860849 microseconds
+
+Execution with 4 MPI nodes and 1 threads.
+rank[0]'s range = 0 ~ 144
+rank[1]'s range = 144 ~ 288
+rank[2]'s range = 288 ~ 432
+rank[3]'s range = 432 ~ 576
+Elapsed time: 588976 microseconds
+
+Execution with 4 MPI nodes and 1 threads.
+rank[0]'s range = 0 ~ 144
+rank[1]'s range = 144 ~ 288
+rank[2]'s range = 288 ~ 432
+rank[3]'s range = 432 ~ 576
+Elapsed time: 581319 microseconds
+
+Execution with 1 MPI nodes and 1 threads.
+rank[0]'s range = 0 ~ 576
+Elapsed time: 1238727 microseconds
+
+Execution with 4 MPI nodes and 1 threads.
+rank[0]'s range = 0 ~ 144
+rank[1]'s range = 144 ~ 288
+rank[2]'s range = 288 ~ 432
+rank[3]'s range = 432 ~ 576
+Elapsed time: 595278 microseconds
+
+Execution with 4 MPI nodes and 4 threads.
+rank[0]'s range = 0 ~ 144
+rank[1]'s range = 144 ~ 288
+rank[2]'s range = 288 ~ 432
+rank[3]'s range = 432 ~ 576
+Elapsed time: 504412 microseconds
+
+Execution with 4 MPI nodes and 1 threads.
+rank[0]'s range = 0 ~ 144
+rank[1]'s range = 144 ~ 288
+rank[2]'s range = 288 ~ 432
+rank[3]'s range = 432 ~ 576
+Elapsed time: 616675 microseconds
+
+Execution with 4 MPI nodes and 4 threads.
+rank[0]'s range = 0 ~ 144
+rank[1]'s range = 144 ~ 288
+rank[2]'s range = 288 ~ 432
+rank[3]'s range = 432 ~ 576
+Elapsed time: 503887 microseconds
+
